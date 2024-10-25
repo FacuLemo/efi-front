@@ -1,12 +1,14 @@
 "use client"
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useContext } from 'react';
 import DropDown from './DropDown';
-import { useRouter } from "next/navigation"
+import { useRouter } from "next/navigation";
+import { AuthContext } from '@/contexts/AuthContext';
 
 
 export default function Navigation() {
   const [menuOpen, setMenuOpen] = useState(false);
   const router = useRouter()
+  const { logout } = useContext(AuthContext);
 
   const handleMenuClick = () => {
     setMenuOpen(!menuOpen);
@@ -14,6 +16,12 @@ export default function Navigation() {
 
   const handleNavbar = (unit) => {
     router.push(unit.id)
+  };
+
+
+  const handleLogOff = () => {
+    logout();  
+    router.push('/login');
   };
 
   return (
@@ -77,15 +85,16 @@ export default function Navigation() {
               placeholder={false}
             />
           </li>
-          <li className='border-none'>
 
+          <li className='border-none'>
             <button
               className="p-2 px-4 rounded-lg bg-red-600 text-white hover:bg-red-700"
+              onClick={handleLogOff}
             >
-              log off
+              Log off
             </button>
-
           </li>
+
         </ul>
       </nav>
     </header>
