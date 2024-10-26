@@ -1,5 +1,7 @@
 "use client"
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
+import { AuthContext } from '@/contexts/AuthContext';
+import { useRouter } from 'next/navigation';
 import PostData from '@/components/PostData';
 import FetchData from '@/components/FetchData';
 import DropDown from '@/components/DropDown';
@@ -11,20 +13,28 @@ function CreateGameForm() {
   const [selectedPlatform, setSelectedPlatform] = useState(null);
   const [genres, setGenres] = useState([]);
   const [platforms, setPlatforms] = useState([]);
-  const token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJjdXJyZW50VXNlciI6eyJpZCI6MSwibmFtZSI6InZhbGVuIiwiZW1haWwiOiJ2YWxAZW4uY29tIiwicGFzc3dvcmQiOiIkMmIkMTAkaFdqS0JCWFZiUnJhMW1sb0Y4U1ZPdTlpM2ZPOXVEMmZGY0t4cGNUdjM2bXZ4S002Q2J3d3UiLCJjcmVhdGVkQXQiOiIyMDI0LTEwLTIzVDIzOjA1OjAyLjAwMFoiLCJ1cGRhdGVkQXQiOiIyMDI0LTEwLTIzVDIzOjA1OjAyLjAwMFoiLCJyb2xlSWQiOjIsIlJvbGUiOnsiaWQiOjIsIm5hbWUiOiJST0xFX0FETUlOIn19LCJpYXQiOjE3Mjk3NDMxMTh9.C_X50u91LLHPQaOfC411I7ozV0kRaOYIlMCAINGrR54"
+
+  const { token, authStatus } = useContext(AuthContext);
+  const router = useRouter();
 
   useEffect(() => {
-    const fetchGenres = async () => {
-      const data = await FetchData('genres', token);
-      setGenres(data);
+
+    const fetchData = async () => {
+      if (token) {
+        const dataGenres = await FetchData('genres', token);
+        const dataPlatforms = await FetchData('platforms', token);
+        setGenres(dataGenres);
+        setPlatforms(dataPlatforms);
+      }
     };
-    const fetchPlatforms = async () => {
-      const data = await FetchData('platforms', token);
-      setPlatforms(data);
-    };
-    fetchGenres();
-    fetchPlatforms();
-  }, []);
+
+    if (authStatus === 'authenticated') {
+      fetchData();
+    } else if (authStatus === 'unauthenticated') {
+      router.push('/login');
+    }
+
+  }, [authStatus, token]);
 
   const handleGenreChange = (genre) => {
     setSelectedGenre(genre);
@@ -58,6 +68,10 @@ function CreateGameForm() {
     }
   };
 
+  if (authStatus === 'loading') {
+    return <p className='text-3xl font-semibold animate-pulse text-center p-20'>Loading...</p>;
+  }
+  
   return (
     <form onSubmit={handleSubmit}>
       <div className='m-5'>

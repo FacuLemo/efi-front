@@ -1,5 +1,6 @@
 "use client"
-import { useState } from "react";
+import React, { useState, useEffect, useContext } from 'react';
+import { AuthContext } from '@/contexts/AuthContext';
 import CartSummary from "@/components/CartSummary";
 import PaymentMethod from '@/components/PaymentMethod';
 import CartConfirmation from '@/components/CartConfirmation';
@@ -10,7 +11,8 @@ function ComponentCarousel() {
   const [currentIndex, setCurrentIndex] = useState(0),
     [selectedPaymentMethod, setSelectedPaymentMethod] = useState(null),
     [cartTotal, setCartTotal] = useState(0)
-  const token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJjdXJyZW50VXNlciI6eyJpZCI6MSwibmFtZSI6InZhbGVuIiwiZW1haWwiOiJ2YWxAZW4uY29tIiwicGFzc3dvcmQiOiIkMmIkMTAkaFdqS0JCWFZiUnJhMW1sb0Y4U1ZPdTlpM2ZPOXVEMmZGY0t4cGNUdjM2bXZ4S002Q2J3d3UiLCJjcmVhdGVkQXQiOiIyMDI0LTEwLTIzVDIzOjA1OjAyLjAwMFoiLCJ1cGRhdGVkQXQiOiIyMDI0LTEwLTIzVDIzOjA1OjAyLjAwMFoiLCJyb2xlSWQiOjIsIlJvbGUiOnsiaWQiOjIsIm5hbWUiOiJST0xFX0FETUlOIn19LCJpYXQiOjE3Mjk3NDMxMTh9.C_X50u91LLHPQaOfC411I7ozV0kRaOYIlMCAINGrR54"
+
+  const { token, authStatus } = useContext(AuthContext);
 
   const router = useRouter();
 
@@ -36,7 +38,7 @@ function ComponentCarousel() {
 
   const finishPurchase = async () => {
     let gamesInCart = JSON.parse(localStorage.getItem("gamesInCart")) || [];
-  
+
     try {
       for (const gameId of gamesInCart) {
         try {
@@ -45,10 +47,10 @@ function ComponentCarousel() {
             { gameId: gameId },
             token
           );
-  
+
           gamesInCart = gamesInCart.filter(id => id !== gameId);
           localStorage.setItem("gamesInCart", JSON.stringify(gamesInCart));
-  
+
         } catch (error) {
           if (error.response && error.response.data.message === "User already has that game") {
             alert(error.response.data.message);
@@ -60,17 +62,21 @@ function ComponentCarousel() {
           }
         }
       }
-  
+
       localStorage.setItem("gamesInCart", "[]");
       router.push("/tienda");
-  
+
     } catch (error) {
       alert("Error al finalizar la compra. Inténtalo de nuevo.");
       router.push("/tienda");
     }
   };
-  
 
+  useEffect(() => {
+    if (authStatus === 'unauthenticated') {
+      router.push('/login');
+    }
+  }, [authStatus, token]);
 
   const components = [
     <CartSummary updateCartTotal={updateCartTotal} />,
@@ -79,6 +85,10 @@ function ComponentCarousel() {
   ];
 
   let progress = ((currentIndex + 1) / components.length) * 100;
+
+  if (authStatus === 'loading') {
+    return <p className='text-3xl font-semibold animate-pulse text-center p-20'>Loading...</p>;
+  }
 
   return (
     <section className="flex flex-col h-screen">

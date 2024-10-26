@@ -1,27 +1,36 @@
 "use client"
-import React, { Fragment, useEffect, useState } from 'react';
+import React, { Fragment, useEffect, useState, useContext } from 'react';
 import FetchData from './FetchData';
+import { AuthContext } from '@/contexts/AuthContext';
+import { useRouter } from 'next/navigation';
 
 function CartSummary({ updateCartTotal }) {
   const [cartGames, setCartGames] = useState([]);
-  const token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJjdXJyZW50VXNlciI6eyJpZCI6MSwibmFtZSI6InZhbGVuIiwiZW1haWwiOiJ2YWxAZW4uY29tIiwicGFzc3dvcmQiOiIkMmIkMTAkaFdqS0JCWFZiUnJhMW1sb0Y4U1ZPdTlpM2ZPOXVEMmZGY0t4cGNUdjM2bXZ4S002Q2J3d3UiLCJjcmVhdGVkQXQiOiIyMDI0LTEwLTIzVDIzOjA1OjAyLjAwMFoiLCJ1cGRhdGVkQXQiOiIyMDI0LTEwLTIzVDIzOjA1OjAyLjAwMFoiLCJyb2xlSWQiOjIsIlJvbGUiOnsiaWQiOjIsIm5hbWUiOiJST0xFX0FETUlOIn19LCJpYXQiOjE3Mjk3NDMxMTh9.C_X50u91LLHPQaOfC411I7ozV0kRaOYIlMCAINGrR54"
+  const { token, authStatus } = useContext(AuthContext);
+  const router = useRouter();
 
   useEffect(() => {
     const fetchCartGames = async () => {
-      const gamesInCart = await JSON.parse(localStorage.getItem("gamesInCart"));
-
-      if (gamesInCart) {
-        const fetchedGames = await Promise.all(
-          gamesInCart.map(async (gameId) => {
-            const data = await FetchData(`games/${gameId}`, token);
-            return data;
-          })
-        )
-        setCartGames(fetchedGames);
+      if (token) {
+        const gamesInCart = await JSON.parse(localStorage.getItem("gamesInCart"));
+        if (gamesInCart) {
+          const fetchedGames = await Promise.all(
+            gamesInCart.map(async (gameId) => {
+              const data = await FetchData(`games/${gameId}`, token);
+              return data;
+            })
+          )
+          setCartGames(fetchedGames);
+        }
       }
     }
-    fetchCartGames();
-  }, [])
+
+    if (authStatus === 'authenticated') {
+      fetchCartGames();
+    } else if (authStatus === 'unauthenticated') {
+      router.push('/login');
+    }
+  }, [authStatus, token])
 
   useEffect(() => {
     if (cartGames.length > 0) {
@@ -34,6 +43,9 @@ function CartSummary({ updateCartTotal }) {
     return cartGames.reduce((sum, game) => sum + parseFloat(game.price), 0);
   };
 
+  if (authStatus === 'loading') {
+    return <p className='text-3xl font-semibold animate-pulse text-center p-20'>Loading...</p>;
+  }
 
   return (
     <section className="p-5">

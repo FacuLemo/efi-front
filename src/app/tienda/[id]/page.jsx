@@ -1,31 +1,43 @@
 "use client"
 import FetchData from '@/components/FetchData'
-import React, { useState, useEffect, Fragment, use } from 'react'
+import React, { useState, useEffect, useContext, use } from 'react'
+import { AuthContext } from '@/contexts/AuthContext';
+import { useRouter } from 'next/navigation';
 
 function Page(context) {
   const [game, setGame] = useState(null);
   const [gameOnCart, setGameOnCart] = useState(false);
   const params = use(context.params)
   const { id } = params
-  const token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJjdXJyZW50VXNlciI6eyJpZCI6MSwibmFtZSI6InZhbGVuIiwiZW1haWwiOiJ2YWxAZW4uY29tIiwicGFzc3dvcmQiOiIkMmIkMTAkaFdqS0JCWFZiUnJhMW1sb0Y4U1ZPdTlpM2ZPOXVEMmZGY0t4cGNUdjM2bXZ4S002Q2J3d3UiLCJjcmVhdGVkQXQiOiIyMDI0LTEwLTIzVDIzOjA1OjAyLjAwMFoiLCJ1cGRhdGVkQXQiOiIyMDI0LTEwLTIzVDIzOjA1OjAyLjAwMFoiLCJyb2xlSWQiOjIsIlJvbGUiOnsiaWQiOjIsIm5hbWUiOiJST0xFX0FETUlOIn19LCJpYXQiOjE3Mjk3NDMxMTh9.C_X50u91LLHPQaOfC411I7ozV0kRaOYIlMCAINGrR54"
+  const { token, authStatus } = useContext(AuthContext);
+  const router = useRouter();
+
 
   useEffect(() => {
-    const cargarDatos = async () => {
-      try {
-        const gameData = await FetchData(`games/${id}`, token);
-        setGame(gameData);
+    const fetchData = async () => {
+      if (token) {
+        try {
+          const gameData = await FetchData(`games/${id}`, token);
+          setGame(gameData);
 
-        const gamesInCart = JSON.parse(localStorage.getItem('gamesInCart')) || [];
-        if (gamesInCart.includes(id)) {
-          setGameOnCart(true);
+          const gamesInCart = JSON.parse(localStorage.getItem('gamesInCart')) || [];
+          if (gamesInCart.includes(id)) {
+            setGameOnCart(true);
+          }
+
+        } catch (error) {
+          console.error('Error loading game data', error);
         }
-
-      } catch (error) {
-        console.error('Error loading game data', error);
       }
     };
-    cargarDatos();
-  }, [id]);
+
+    if (authStatus === 'authenticated') {
+      fetchData();
+    } else if (authStatus === 'unauthenticated') {
+      router.push('/login');
+    }
+
+  }, [id, authStatus, token]);
 
   const handleAddToCart = () => {
     const gamesInCart = JSON.parse(localStorage.getItem('gamesInCart')) || [];
@@ -40,7 +52,7 @@ function Page(context) {
   };
 
   if (!game) {
-    return <p className='flex justify-center w-full p-20 text-5xl font-bold animate-pulse'>Loading...</p>;
+    return <p className='text-3xl font-semibold animate-pulse text-center p-20'>Loading...</p>;
   }
 
   return (
