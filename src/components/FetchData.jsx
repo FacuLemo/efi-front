@@ -11,7 +11,6 @@ const FetchData = async (endpoint, token) => {
         }
       }
     )
-
     const data = response.data;
 
     return data

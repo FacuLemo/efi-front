@@ -6,12 +6,12 @@ import { useRouter } from 'next/navigation';
 
 function Page(context) {
   const [game, setGame] = useState(null);
+  const [reviews, setReviews] = useState([])
   const [gameOnCart, setGameOnCart] = useState(false);
   const params = use(context.params)
   const { id } = params
   const { token, authStatus } = useContext(AuthContext);
   const router = useRouter();
-
 
   useEffect(() => {
     const fetchData = async () => {
@@ -19,6 +19,10 @@ function Page(context) {
         try {
           const gameData = await FetchData(`games/${id}`, token);
           setGame(gameData);
+
+          const reviewData = await FetchData(`reviews/${id}`, token)
+          setReviews(reviewData)
+          console.log("🚀 ~ fetchData ~ reviewData:", reviewData)
 
           const gamesInCart = JSON.parse(localStorage.getItem('gamesInCart')) || [];
           if (gamesInCart.includes(id)) {
@@ -91,6 +95,49 @@ function Page(context) {
         </div>
         <p>Total Sales: {game.sales}</p>
       </section>
+
+      <section className='w-screen flex justify-center'>
+        <div className='w-10/12'>
+
+          {reviews ? (
+            reviews.map((r, i) => {
+              return (
+                <div
+                  key={`review-${i}`}
+                  className='flex w-11/12 m-5 px-4 py-2 border-2 border-solid border-white'
+                >
+                  <div
+                    className='flex mr-5 pr-5 border-r-white border-r-2'
+                  >
+                    <p>usuario</p>
+                  </div>
+                  <div className='w-full'>
+                    <div 
+                      className='w-full flex justify-between gap-4'
+                    >
+                      <p>
+                        {r.rating}
+                      </p>
+                      <p>
+                        {r.createdAt}
+                      </p>
+                        {
+                          r.updatedAt != r.createdAt
+                            ? <p> r.updatedAt </p>
+                            : null
+                        }
+                    </div>
+                    <p>
+                      {r.comment}
+                    </p>
+                  </div>
+                </div>
+              )
+            })
+          ) : null}
+        </div>
+      </section>
+
     </article>
   );
 }
