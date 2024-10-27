@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import pfp from '@/../public/pfp.webp'
 import toArgDate from '@/utils/toArgDate';
+import { StarOutlined, StarFilled } from '@ant-design/icons';
 
 function Page(context) {
   const [game, setGame] = useState(null);
@@ -24,8 +25,20 @@ function Page(context) {
           setGame(gameData);
 
           const reviewData = await FetchData(`reviews/${id}`, token)
-          setReviews(reviewData)
-          console.log("🚀 ~ fetchData ~ reviewData:", reviewData)
+
+          let users = {}
+          const completeReviews = await Promise.all(reviewData.map(async (r) => {
+            if (!(r.UserId in users)) {
+              users[`${r.UserId}`] = await FetchData(`users/${r.UserId}`, token)
+            }
+
+            return {
+              ...r,
+              user: users[`${r.UserId}`]
+            }
+          }))
+
+          setReviews(completeReviews)
 
           const gamesInCart = JSON.parse(localStorage.getItem('gamesInCart')) || [];
           if (gamesInCart.includes(id)) {
@@ -119,15 +132,19 @@ function Page(context) {
                         height={100}
                         alt=''
                       />
-                      <p>user</p>
+                      <p>{r.user.name}</p>
                     </div>
                     <div className='w-full py-1'>
                       <div
                         className='w-full flex justify-between gap-4'
                       >
-                        <p>
-                          {r.rating}
-                        </p>
+                        <div className='flex my-1'>
+                          
+                          {Array(5).fill('').map((_, i) => {
+                            if (i <= r.rating) return <StarFilled key={`starFilled-${i}`} width={5} />
+                            else return <StarOutlined key={`starOutline-${i}`} width={5} />
+                          })}
+                        </div>
                         
                       </div>
                       <p>
