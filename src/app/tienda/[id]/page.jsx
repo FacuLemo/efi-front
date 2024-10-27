@@ -3,6 +3,9 @@ import FetchData from '@/components/FetchData'
 import React, { useState, useEffect, useContext, use } from 'react'
 import { AuthContext } from '@/contexts/AuthContext';
 import { useRouter } from 'next/navigation';
+import Image from 'next/image';
+import pfp from '@/../public/pfp.webp'
+import toArgDate from '@/utils/toArgDate';
 
 function Page(context) {
   const [game, setGame] = useState(null);
@@ -104,33 +107,46 @@ function Page(context) {
               return (
                 <div
                   key={`review-${i}`}
-                  className='flex w-11/12 m-5 px-4 py-2 border-2 border-solid border-white'
+                  className='flex w-full'
                 >
-                  <div
-                    className='flex mr-5 pr-5 border-r-white border-r-2'
-                  >
-                    <p>usuario</p>
-                  </div>
-                  <div className='w-full'>
-                    <div 
-                      className='w-full flex justify-between gap-4'
+                  <div className='flex w-11/12 m-5 px-4 py-2 border-2 border-solid border-white'>
+                    <div
+                      className='flex flex-col items-center gap-2 mx-2 pr-5 my-2 border-r-white border-r-2'
                     >
-                      <p>
-                        {r.rating}
-                      </p>
-                      <p>
-                        {r.createdAt}
-                      </p>
-                        {
-                          r.updatedAt != r.createdAt
-                            ? <p> r.updatedAt </p>
-                            : null
-                        }
+                      <Image
+                        src="/pfp.webp"
+                        width={100}
+                        height={100}
+                        alt=''
+                      />
+                      <p>user</p>
                     </div>
-                    <p>
-                      {r.comment}
-                    </p>
+                    <div className='w-full py-1'>
+                      <div
+                        className='w-full flex justify-between gap-4'
+                      >
+                        <p>
+                          {r.rating}
+                        </p>
+                        
+                      </div>
+                      <p>
+                        {r.comment}
+                      </p>
+                    </div>
+                    
                   </div>
+                  <div className='flex min-w-60 mt-5 flex-col'>
+                          <p>
+                            posted: {toArgDate(r.createdAt)}
+                          </p>
+                          {
+                            // r.updatedAt != r.createdAt
+                            true
+                              ? <p> edited: {toArgDate(r.updatedAt)} </p>
+                              : null
+                          }
+                        </div>
                 </div>
               )
             })
