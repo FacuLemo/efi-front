@@ -6,7 +6,8 @@ import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import pfp from '@/../public/pfp.webp'
 import toArgDate from '@/utils/toArgDate';
-import { StarOutlined, StarFilled } from '@ant-design/icons';
+import StarFilled from '@/../public/StarFilled.svg'
+import StarOutline from '@/../public/StarOutline.svg'
 
 function Page(context) {
   const [game, setGame] = useState(null);
@@ -141,8 +142,24 @@ function Page(context) {
                         <div className='flex my-1'>
                           
                           {Array(5).fill('').map((_, i) => {
-                            if (i <= r.rating) return <StarFilled key={`starFilled-${i}`} width={5} />
-                            else return <StarOutlined key={`starOutline-${i}`} width={5} />
+                            if (i <= r.rating) return (
+                              <Image 
+                                alt=''
+                                key={`star-${i}`}
+                                width={15}
+                                height={15}
+                                src={StarFilled}
+                              />
+                            )
+                            else return (
+                              <Image 
+                                alt=''
+                                key={`star-${i}`}
+                                width={15}
+                                height={15}
+                                src={StarOutline}
+                              />
+                            )
                           })}
                         </div>
                         
