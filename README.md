@@ -1,6 +1,6 @@
 This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
 
-It contains the source code for the User Interface of the EFI in the programming III subject at iTEc.
+It contains the source code for the User Interface of the EFI in the programming III subject at iTEC, with professor in charge Agustín Invaldi.
 
 You need to have the backend running if you want the front to work properly.
 - see the [Api-Rest Repository](https://github.com/nazabucciarelli/efi-api)
@@ -23,12 +23,10 @@ Open [http://localhost:3000](http://localhost:3000) with your browser to see the
 
 
 ## Contributors:
-- Backend:
-    - [Nazareno Bucciarelli](https://github.com/nazabucciarelli)
-    - [Luca "El Teclas" Petrocchi](https://github.com/LucaPetrocchi)
-- Frontend:
-    - [Facundo Esteban Lemo](https://github.com/FacuLemo)
-    - [Valentino Arballo](https://github.com/valentinoarballo)
+- [Nazareno Bucciarelli](https://github.com/nazabucciarelli)
+- [Luca "El Teclas" Petrocchi](https://github.com/LucaPetrocchi)
+- [Facundo Esteban Lemo](https://github.com/FacuLemo)
+- [Valentino Arballo](https://github.com/valentinoarballo)
 
 
 ## Requirements:
