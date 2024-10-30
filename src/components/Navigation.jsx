@@ -79,7 +79,7 @@ export default function Navigation() {
               dark={true}
               handler={handleNavbar}
               units={[
-                { id: `/usuario/${user.id}`, nombre: "My Profile" },
+                { id: `/usuario/${user?.id}`, nombre: "My Profile" },
               ]}
               label="Profile"
               placeholder={false}

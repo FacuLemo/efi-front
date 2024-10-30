@@ -44,6 +44,7 @@ function Page(context) {
       <hr className='mx-28 '/>
 
       {/* Agregar acá la biblioteca del usuario */}
+      {profile.id === user.id ? <div>Coincide con usuario logeado!</div> : <div>La biblioteca de {profile.name} es privada.</div>}
     </div>
   )
 }
