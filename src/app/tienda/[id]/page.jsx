@@ -13,8 +13,7 @@ import StarOutline from '@/../public/StarOutline.svg'
 function Page(context) {
   const params = use(context.params)
   const { id } = params
-  const { token, authStatus, user } = useContext(AuthContext);
-  console.log("🚀 ~ Page ~ user:", user)
+  const { user, token, authStatus } = useContext(AuthContext);
   const router = useRouter();
 
   const [game, setGame] = useState(null);
@@ -22,15 +21,63 @@ function Page(context) {
   const [gameOnCart, setGameOnCart] = useState(false);
   const [comment, setComment] = useState({
     enabled: true,
-    text: null,
+    text: '',
     rating: 5,
   })
 
-  const handleCommentChange = (value, key) => {
+  const handleAddToCart = () => {
+    const gamesInCart = JSON.parse(localStorage.getItem('gamesInCart')) || [];
+
+    if (!gamesInCart.includes(id)) {
+      gamesInCart.push(id);
+      localStorage.setItem('gamesInCart', JSON.stringify(gamesInCart));
+      setGameOnCart(true);
+    } else {
+      console.log('Game already on cart');
+    }
+  };
+
+  const handleComment = (key, value) => {
     setComment({
       ...comment,
       [key]: value
     })
+  }
+
+  const handleCommentText = handleComment.bind(null, 'text')
+  const handleCommentEnabled = handleComment.bind(null, 'enabled')
+  const handleRatingUp = (e) => {
+    e.preventDefault()
+    if (comment.rating >= 5) return;
+    setComment((prev) => {
+      return {
+        ...prev,
+        rating: prev.rating + 1
+      }
+    })
+  }
+  const handleRatingDown = (e) => {
+    e.preventDefault()
+    if (comment.rating <= 0) return;
+    setComment((prev) => {
+      return {
+        ...prev,
+        rating: prev.rating - 1
+      }
+    })
+  }
+
+  const handlePostComment = async (formData) => {
+    try {
+      await PostData('reviews', {
+        comment: comment.text,
+        rating: comment.rating,
+        gameId: id,
+      }, token)
+      location.reload()
+    } catch (error) {
+      console.error('Error posting comment', error)
+    }
   }
 
   useEffect(() => {
@@ -49,7 +96,7 @@ function Page(context) {
             }
 
             if (r.UserId == user.id) {
-              handleCommentChange(false, 'enabled')
+              handleCommentEnabled(false)
             }
 
             return {
@@ -78,32 +125,6 @@ function Page(context) {
     }
 
   }, [id, authStatus, token]);
-
-  const handleAddToCart = () => {
-    const gamesInCart = JSON.parse(localStorage.getItem('gamesInCart')) || [];
-
-    if (!gamesInCart.includes(id)) {
-      gamesInCart.push(id);
-      localStorage.setItem('gamesInCart', JSON.stringify(gamesInCart));
-      setGameOnCart(true);
-    } else {
-      console.log('Game already on cart');
-    }
-  };
-
-  const handlePostComment = async (formData) => {
-    const comment = formData.get('comment');
-    const rating = formData.get('rating')
-    try {
-      await PostData('reviews', {
-        comment: comment,
-        rating: rating,
-        gameId: id,
-      }, token)
-    } catch (error) {
-      console.error('Error posting comment', error)
-    }
-  }
 
   if (!game) {
     return <p className='text-3xl font-semibold animate-pulse text-center p-20'>Loading...</p>;
@@ -146,27 +167,73 @@ function Page(context) {
         <p>Total Sales: {game.sales}</p>
       </section>
 
-      {comment.enabled ? (
-        <section className='w-10/12 flex flex-col justify-center text-black'>
-            <form action={handlePostComment}>
-              <input name="comment" placeholder='What did you think?' />
-              <input name='rating' type='number' min='1' max='5' step='1' />
-              <button type='submit'>Comment</button>
-            </form>
-        </section>
-      ) : null}
+      <section className='w-12/12 flex flex-col items-center justify-center'>
+        {comment.enabled ? (
+          <>
+            <div className='w-10/12 mx-20'>
+              <form
+                action={handlePostComment}
+                className='w-10/12 m-5 py-2 px-2 flex flex-col border-white border-2'
+              >
+                <div className='w-full'>
+                  <textarea
+                    name="comment"
+                    placeholder='What did you think?'
+                    value={comment.text}
+                    onChange={(e) => handleCommentText(e.target.value)}
+                    className='w-full mt-2 ml-4 bg-transparent outline-none resize-none'
+                  />
+                </div>
+                <div
+                  className='self-end flex'
+                >
+                  <div className='flex items-center bg-white text-black mr-6'>
+                    <button
+                      className='w-6'
+                      value={comment.rating - 1}
+                      onClick={handleRatingDown}
+                    >
+                      {`-`}
+                    </button>
+                    <p
+                      className='border-white border-2'
+                    >
+                      {comment.rating}
+                    </p>
+                    <button
+                      className='w-6'
+                      value={comment.rating + 1}
+                      onClick={handleRatingUp}
+                    >
+                      {`+`}
+                    </button>
+                  </div>
+                  <button
+                    className='py-2 px-4 bg-white text-black border-white border-2'
+                    type='submit'
+                  >
+                    Comment
+                  </button>
+                </div>
+              </form>
+            </div>
+          </>
+        ) : (
+          <p>
+            You&apos;ve already reviewed this game!
+          </p>
+        )}
 
-      {reviews
-        ? (
-          <section className='w-screen flex justify-center'>
-            <div className='w-10/12'>
+        {reviews
+          ? (
+            <div className='w-10/12 mt-5'>
               {reviews.map((r, i) => {
                 return (
                   <div
                     key={`review-${i}`}
                     className='flex w-full'
                   >
-                    <div className='flex w-11/12 m-5 px-4 py-2 border-2 border-solid border-white'>
+                    <div className='flex w-10/12 m-5 px-4 py-2 border-2 border-solid border-white'>
                       <div
                         className='flex flex-col items-center gap-2 mx-2 pr-5 my-2 border-r-white border-r-2'
                       >
@@ -213,7 +280,7 @@ function Page(context) {
                       </div>
 
                     </div>
-                    <div className='flex min-w-60 mt-5 flex-col'>
+                    <div className='flex min-w-40 mt-5 flex-col'>
                       <p>
                         posted: {toArgDate(r.createdAt)}
                       </p>
@@ -228,10 +295,9 @@ function Page(context) {
                 )
               })}
             </div>
-          </section>
-        ) : null}
+          ) : null}
 
-
+      </section>
 
     </article>
   );
