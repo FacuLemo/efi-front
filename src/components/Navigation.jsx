@@ -8,7 +8,7 @@ import { AuthContext } from '@/contexts/AuthContext';
 export default function Navigation() {
   const [menuOpen, setMenuOpen] = useState(false);
   const router = useRouter()
-  const { logout } = useContext(AuthContext);
+  const { user, logout } = useContext(AuthContext);
 
   const handleMenuClick = () => {
     setMenuOpen(!menuOpen);
@@ -79,7 +79,7 @@ export default function Navigation() {
               dark={true}
               handler={handleNavbar}
               units={[
-                { id: "/usuario", nombre: "Profile" },
+                { id: `/usuario/${user?.id}`, nombre: "My Profile" },
               ]}
               label="Profile"
               placeholder={false}

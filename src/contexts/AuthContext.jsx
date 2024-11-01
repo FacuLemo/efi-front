@@ -22,10 +22,13 @@ export function AuthProvider({ children }) {
   const login = async (email, password) => {
     try {
       const response = await PostData('/users/login', { email, password });
-      const { authorizationToken } = response;
+      const {user_id, authorizationToken } = response;
+      const user_obj = {id: user_id, email}
       localStorage.setItem('token', authorizationToken);
+      localStorage.setItem('user', JSON.stringify(user_obj));
       setToken(authorizationToken);
-      setUserData(authorizationToken)
+      //setUser(user_obj);
+      setUserData(authorizationToken);
       setAuthStatus('authenticated');
     } catch (error) {
       console.error("Login error", error);
@@ -42,7 +45,9 @@ export function AuthProvider({ children }) {
 
   useEffect(() => {
     const savedToken = localStorage.getItem('token');
-    if (savedToken) {
+    const savedUser = localStorage.getItem('user');
+    if (savedToken && savedUser) {
+      setUser(JSON.parse(savedUser));
       setToken(savedToken);
       setUserData(savedToken);
       setAuthStatus('authenticated');
