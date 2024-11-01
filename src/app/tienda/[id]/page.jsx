@@ -17,23 +17,23 @@ function Page(context) {
   const router = useRouter();
 
   const [game, setGame] = useState(null);
-  const [reviews, setReviews] = useState([])
+  const [reviews, setReviews] = useState([]);
+  const [isOwned, setIsOwned] = useState(false);
   const [gameOnCart, setGameOnCart] = useState(false);
   const [comment, setComment] = useState({
     enabled: true,
     text: '',
     rating: 5,
-  })
+  });
 
   const handleAddToCart = () => {
     const gamesInCart = JSON.parse(localStorage.getItem('gamesInCart')) || [];
-
     if (!gamesInCart.includes(id)) {
       gamesInCart.push(id);
       localStorage.setItem('gamesInCart', JSON.stringify(gamesInCart));
       setGameOnCart(true);
     } else {
-      console.log('Game already on cart');
+      console.error('Game already on cart');
     }
   };
 
@@ -89,6 +89,15 @@ function Page(context) {
 
           const reviewData = await FetchData(`reviews/${id}`, token)
 
+          const profilePurchases = await FetchData("purchases/", token);
+          try {
+            profilePurchases.map((game, index) => (
+              game.gameId == id ? setIsOwned(true) : ""
+            ))
+          }
+          catch (e) {
+            console.error("Error obteniendo el historial de compras del usuario", e)
+          }
           let users = {}
           const completeReviews = await Promise.all(reviewData.map(async (r) => {
             if (!(r.UserId in users)) {
@@ -139,23 +148,36 @@ function Page(context) {
         </div>
 
         <div className='transition-all ease-in-out'>
-          {gameOnCart ? (
-            <a
-              className='w-[20rem] h-[3rem] items-center flex bg-black hover:scale-105 transition-all duration-150 ease-in-out hover:shadow-lg hover:shadow-cyan-500/20 cursor-pointer'
-              href='/carrito'
-            >
-              <p className='w-1/2 text-center text-lg'>ARS$ {game.price}</p>
-              <p className='w-1/2 h-full flex items-center font-semibold justify-center text-center bg-blue-400'>Already on cart</p>
-            </a>
-          ) : (
-            <button
-              className='w-[20rem] h-[3rem] items-center flex bg-black hover:scale-105 transition-all duration-150 ease-in-out hover:shadow-lg hover:shadow-green-500/20 cursor-pointer'
-              onClick={handleAddToCart}
-            >
-              <p className='w-1/2 text-center text-lg'>ARS$ {game.price}</p>
-              <p className='w-1/2 h-full flex items-center font-semibold justify-center text-center bg-green-600'>Add to cart</p>
-            </button>
-          )}
+          {isOwned ?
+            (<div>
+              <div
+                className='w-[20rem] h-[3rem] items-center flex bg-black hover:scale-105 hover:shadow-lg hover:shadow-cyan-500/20 cursor-not-allowed'
+              >
+                <p className='w-1/2 text-center text-lg'>ARS$ {game.price}</p>
+                <p className='w-1/2 h-full flex items-center select-none font-semibold justify-center text-center bg-blue-400'>¡You already own this game!</p>
+              </div>
+            </div>)
+            :
+            (<div>
+              {gameOnCart ? (
+                <a
+                  className='w-[20rem] h-[3rem] items-center flex bg-black hover:scale-105 transition-all duration-150 ease-in-out hover:shadow-lg hover:shadow-cyan-500/20 cursor-pointer'
+                  href='/carrito'
+                >
+                  <p className='w-1/2 text-center text-lg'>ARS$ {game.price}</p>
+                  <p className='w-1/2 h-full flex items-center font-semibold justify-center text-center bg-blue-400'>Already on cart</p>
+                </a>
+              ) : (
+                <button
+                  className='w-[20rem] h-[3rem] items-center flex bg-black hover:scale-105 transition-all duration-150 ease-in-out hover:shadow-lg hover:shadow-green-500/20 cursor-pointer'
+                  onClick={handleAddToCart}
+                >
+                  <p className='w-1/2 text-center text-lg'>ARS$ {game.price}</p>
+                  <p className='w-1/2 h-full flex items-center font-semibold justify-center text-center bg-green-600'>Add to cart</p>
+                </button>
+              )}
+            </div>)
+          }
         </div>
       </section>
 
@@ -167,13 +189,16 @@ function Page(context) {
         <p>Total Sales: {game.sales}</p>
       </section>
 
+      <hr className='mx-12 mt-5 mb-10'/>
+
       <section className='w-12/12 flex flex-col items-center justify-center'>
-        {comment.enabled ? (
+        {isOwned && comment.enabled ? (
           <>
             <div className='w-10/12 mx-20'>
+              <p className='px-5'>Add a review...</p>
               <form
                 action={handlePostComment}
-                className='w-10/12 m-5 py-2 px-2 flex flex-col border-white border-2'
+                className='w-10/12 m-5 mt-1 py-2 px-2 flex flex-col border-white border-2'
               >
                 <div className='w-full'>
                   <textarea
@@ -220,7 +245,7 @@ function Page(context) {
           </>
         ) : (
           <p>
-            You&apos;ve already reviewed this game!
+            {!isOwned ? "You must own the game to post a review." : " You've already reviewed this game!"}
           </p>
         )}
 
