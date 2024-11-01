@@ -7,7 +7,7 @@ const FetchData = async (endpoint, token) => {
       {
         headers: {
           'Content-Type': 'application/json',
-          'authorization': `niga-token ${token}`
+          'authorization': `token ${token}`
         }
       }
     )
