@@ -58,7 +58,7 @@ function Page(context) {
   }
   const handleRatingDown = (e) => {
     e.preventDefault()
-    if (comment.rating <= 0) return;
+    if (comment.rating <= 1) return;
     setComment((prev) => {
       return {
         ...prev,
@@ -214,7 +214,7 @@ function Page(context) {
                 >
                   <div className='flex items-center bg-white text-black mr-6'>
                     <button
-                      className='w-6'
+                      className='w-6 h-full hover:bg-slate-200'
                       value={comment.rating - 1}
                       onClick={handleRatingDown}
                     >
@@ -226,7 +226,7 @@ function Page(context) {
                       {comment.rating}
                     </p>
                     <button
-                      className='w-6'
+                      className='w-6 h-full hover:bg-slate-200'
                       value={comment.rating + 1}
                       onClick={handleRatingUp}
                     >
@@ -277,7 +277,7 @@ function Page(context) {
                           <div className='flex my-1'>
 
                             {Array(5).fill('').map((_, i) => {
-                              if (i <= r.rating) return (
+                              if (i < r.rating) return (
                                 <Image
                                   alt=''
                                   key={`star-${i}`}
