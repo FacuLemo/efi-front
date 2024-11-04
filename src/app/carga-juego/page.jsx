@@ -9,18 +9,22 @@ import DropDown from '@/components/DropDown';
 function CreateGameForm() {
   const [title, setTitle] = useState('');
   const [price, setPrice] = useState('');
+  const [userRole, setUserRole] = useState('');
   const [selectedGenre, setSelectedGenre] = useState(null);
   const [selectedPlatform, setSelectedPlatform] = useState(null);
   const [genres, setGenres] = useState([]);
   const [platforms, setPlatforms] = useState([]);
 
-  const { token, authStatus } = useContext(AuthContext);
+  const { token, authStatus, user } = useContext(AuthContext);
   const router = useRouter();
 
   useEffect(() => {
-
     const fetchData = async () => {
-      if (token) {
+      if (token && user) {
+        
+        const userRole = await FetchData(`users/${user.id}`, token)
+        if (userRole.roleId == 1) { router.push('/') }
+
         const dataGenres = await FetchData('genres', token);
         const dataPlatforms = await FetchData('platforms', token);
         setGenres(dataGenres);
@@ -71,7 +75,7 @@ function CreateGameForm() {
   if (authStatus === 'loading') {
     return <p className='text-3xl font-semibold animate-pulse text-center p-20'>Loading...</p>;
   }
-  
+
   return (
     <form onSubmit={handleSubmit}>
       <div className='m-5'>
