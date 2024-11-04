@@ -35,7 +35,7 @@ function CreateGameForm() {
     if (authStatus === 'authenticated') {
       fetchData();
     } else if (authStatus === 'unauthenticated') {
-      router.push('/login');
+      router.push('/');
     }
 
   }, [authStatus, token]);

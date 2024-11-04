@@ -28,8 +28,6 @@ export default function Navigation() {
 
     if (authStatus === 'authenticated') {
       fetchData();
-    } else if (authStatus === 'unauthenticated') {
-      router.push('/login');
     }
 
   }, [user, authStatus, token]);
@@ -45,7 +43,7 @@ export default function Navigation() {
 
   const handleLogOff = () => {
     logout();
-    router.push('/login');
+    router.push('/');
   };
 
   return (
@@ -78,64 +76,55 @@ export default function Navigation() {
           </span>
         </div>
 
-        <ul className={`md:flex md:items-center md:static absolute w-full [&>li>a]:text-xl [&>li>a]:w-full [&>li>a]:transition-all [&>li>a]:duration-200
+        {authStatus === 'authenticated' && (
+          <ul className={`md:flex md:items-center md:static absolute w-full [&>li>a]:text-xl [&>li>a]:w-full [&>li>a]:transition-all [&>li>a]:duration-200
                             left-0 md:w-auto md:py-0 py-4 md:pl-0 pl-7 md:opacity-100 z-50  ${menuOpen ? "opacity-100 top-[80px] bg-slate-800" : "opacity-0 top-[-400px]"}
                             transition-all ease-in duration-[400ms] [&>li]:mx-4 [&>li]:my-6 [&>li]:md:my-0`}>
 
-          <li className='z-40 relative'>
-            {userRole.roleId == 1 && (
+            <li className='z-40 relative'>
+
+              <DropDown
+                dark={true}
+                handler={handleNavbar}
+                units={
+                  userRole.roleId == 2 ? [
+                    { id: "/tienda", nombre: "Store" },
+                    { id: "/carrito", nombre: "Cart" },
+                    { id: "/carga-juego", nombre: "Add" },
+                  ]
+                    :
+                    [
+                      { id: "/tienda", nombre: "Store" },
+                      { id: "/carrito", nombre: "Cart" },
+                    ]}
+                label="Store Options"
+                placeholder={false}
+              />
+            </li>
+
+            <li className='z-10 relative'>
               <DropDown
                 dark={true}
                 handler={handleNavbar}
                 units={[
-                  { id: "/tienda", nombre: "Store" },
-                  { id: "/carrito", nombre: "Cart" },
+                  { id: `/usuario/${user?.id}`, nombre: `${user?.name}` },
                 ]}
-                label="Store Options"
+                label="My Profile"
                 placeholder={false}
               />
-            )}
+            </li>
 
-            {userRole.roleId == 2 && (
-              <DropDown
-                dark={true}
-                handler={handleNavbar}
-                units={[
-                  { id: "/tienda", nombre: "Store" },
-                  { id: "/carrito", nombre: "Cart" },
-                  { id: "/carga-juego", nombre: "Add" },
-                ]}
-                label="Store Options"
-                placeholder={false}
-              />
-            )}
+            <li className='border-none'>
+              <button
+                className="p-2 px-4 rounded-lg bg-red-600 text-white hover:bg-red-700"
+                onClick={handleLogOff}
+              >
+                Log off
+              </button>
+            </li>
 
-
-
-          </li>
-
-          <li className='z-10 relative'>
-            <DropDown
-              dark={true}
-              handler={handleNavbar}
-              units={[
-                { id: `/usuario/${user?.id}`, nombre: `${user?.name}` },
-              ]}
-              label="My Profile"
-              placeholder={false}
-            />
-          </li>
-
-          <li className='border-none'>
-            <button
-              className="p-2 px-4 rounded-lg bg-red-600 text-white hover:bg-red-700"
-              onClick={handleLogOff}
-            >
-              Log off
-            </button>
-          </li>
-
-        </ul>
+          </ul>
+        )}
       </nav>
     </header>
 
