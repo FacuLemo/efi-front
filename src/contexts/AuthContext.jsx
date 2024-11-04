@@ -8,26 +8,23 @@ export const AuthContext = createContext();
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
   const [token, setToken] = useState(null);
-  const [authStatus, setAuthStatus] = useState('loading'); 
+  const [authStatus, setAuthStatus] = useState('loading');
 
   const setUserData = (token) => {
     const { currentUser } = decodeToken(token)
-    setUser({ 
+    setUser({
       email: currentUser.email,
       name: currentUser.name,
       id: currentUser.id,
-     });
+    });
   }
 
   const login = async (email, password) => {
     try {
       const response = await PostData('/users/login', { email, password });
-      const {user_id, authorizationToken } = response;
-      const user_obj = {id: user_id, email}
+      const { authorizationToken } = response;
       localStorage.setItem('token', authorizationToken);
-      localStorage.setItem('user', JSON.stringify(user_obj));
       setToken(authorizationToken);
-      //setUser(user_obj);
       setUserData(authorizationToken);
       setAuthStatus('authenticated');
     } catch (error) {
@@ -37,7 +34,7 @@ export function AuthProvider({ children }) {
   };
 
   const logout = () => {
-    localStorage.removeItem('token'); 
+    localStorage.removeItem('token');
     setToken(null);
     setUser(null);
     setAuthStatus('unauthenticated');
@@ -45,9 +42,7 @@ export function AuthProvider({ children }) {
 
   useEffect(() => {
     const savedToken = localStorage.getItem('token');
-    const savedUser = localStorage.getItem('user');
-    if (savedToken && savedUser) {
-      setUser(JSON.parse(savedUser));
+    if (savedToken) {
       setToken(savedToken);
       setUserData(savedToken);
       setAuthStatus('authenticated');

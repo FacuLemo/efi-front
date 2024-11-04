@@ -43,7 +43,6 @@ function Page(context) {
         try {
           const profileHistory = await FetchData("purchases/", token);
           setPurchases(profileHistory)
-          console.log(profileHistory)
         } catch (error) {
           console.error('Error loading purchases history', error);
         }

@@ -1,5 +1,6 @@
 "use client"
 import React, { useEffect, useState, useContext } from 'react';
+import FetchData from '@/components/FetchData'
 import DropDown from './DropDown';
 import { useRouter } from "next/navigation";
 import { AuthContext } from '@/contexts/AuthContext';
@@ -7,8 +8,31 @@ import { AuthContext } from '@/contexts/AuthContext';
 
 export default function Navigation() {
   const [menuOpen, setMenuOpen] = useState(false);
+  const [userRole, setUserRole] = useState("");
   const router = useRouter()
-  const { user, logout } = useContext(AuthContext);
+  const { user, logout, authStatus, token } = useContext(AuthContext);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      if (token && user) {
+        try {
+
+          const userRole = await FetchData(`users/${user.id}`, token)
+          setUserRole(userRole)
+
+        } catch (error) {
+          console.error('Error loading user role', error);
+        }
+      }
+    };
+
+    if (authStatus === 'authenticated') {
+      fetchData();
+    } else if (authStatus === 'unauthenticated') {
+      router.push('/login');
+    }
+
+  }, [user, authStatus, token]);
 
   const handleMenuClick = () => {
     setMenuOpen(!menuOpen);
@@ -20,7 +44,7 @@ export default function Navigation() {
 
 
   const handleLogOff = () => {
-    logout();  
+    logout();
     router.push('/login');
   };
 
@@ -59,18 +83,34 @@ export default function Navigation() {
                             transition-all ease-in duration-[400ms] [&>li]:mx-4 [&>li]:my-6 [&>li]:md:my-0`}>
 
           <li className='z-40 relative'>
+            {userRole.roleId == 1 && (
+              <DropDown
+                dark={true}
+                handler={handleNavbar}
+                units={[
+                  { id: "/tienda", nombre: "Store" },
+                  { id: "/carrito", nombre: "Cart" },
+                ]}
+                label="Store Options"
+                placeholder={false}
+              />
+            )}
 
-            <DropDown
-              dark={true}
-              handler={handleNavbar}
-              units={[
-                { id: "/tienda", nombre: "Store" },
-                { id: "/carrito", nombre: "Cart" },
-                { id: "/carga-juego", nombre: "Add" },
-              ]}
-              label="Store Options"
-              placeholder={false}
-            />
+            {userRole.roleId == 2 && (
+              <DropDown
+                dark={true}
+                handler={handleNavbar}
+                units={[
+                  { id: "/tienda", nombre: "Store" },
+                  { id: "/carrito", nombre: "Cart" },
+                  { id: "/carga-juego", nombre: "Add" },
+                ]}
+                label="Store Options"
+                placeholder={false}
+              />
+            )}
+
+
 
           </li>
 
@@ -79,9 +119,9 @@ export default function Navigation() {
               dark={true}
               handler={handleNavbar}
               units={[
-                { id: `/usuario/${user?.id}`, nombre: "My Profile" },
+                { id: `/usuario/${user?.id}`, nombre: `${user?.name}` },
               ]}
-              label="Profile"
+              label="My Profile"
               placeholder={false}
             />
           </li>
