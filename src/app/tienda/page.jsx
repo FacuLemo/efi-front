@@ -43,7 +43,7 @@ function Page() {
             </div>
           ))
         ) : (
-          <p className='text-3xl font-semibold animate-pulse m-20'>Cargando...</p>
+          <p className='text-3xl font-semibold animate-pulse m-20'>Loading...</p>
         )}
       </div>
     </div>
