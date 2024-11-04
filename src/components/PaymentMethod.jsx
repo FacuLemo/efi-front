@@ -11,7 +11,7 @@ function PaymentMethod({ onPaymentSelect }) {
 
   return (
     <section className='w-full h-[80vh] items-center flex flex-col gap-10 justify-center'>
-      <div className={`shadow-xl border rounded-lg p-10 w-1/3 flex justify-between items-center ${selectedMethod === 'mastercard' ? 'border-blue-500' : ''}`} onClick={() => handleSelection('mastercard')}>
+      <div className={`shadow-xl border rounded p-10 w-1/3 flex justify-between items-center hover:bg-slate-800 cursor-pointer ${selectedMethod === 'mastercard' ? 'border-blue-500 bg-gray-950' : ''}`} onClick={() => handleSelection('mastercard')}>
         <div className='flex items-center gap-2'>
           <svg width="40" height="40" fill="currentColor" className="bi bi-credit-card" viewBox="0 0 16 16">
             <path d="M0 4a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2zm2-1a1 1 0 0 0-1 1v1h14V4a1 1 0 0 0-1-1zm13 4H1v5a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1z" />
@@ -29,7 +29,7 @@ function PaymentMethod({ onPaymentSelect }) {
         />
       </div>
 
-      <div className={`shadow-xl border rounded-lg p-10 w-1/3 flex justify-between items-center ${selectedMethod === 'visa' ? 'border-blue-500' : ''}`} onClick={() => handleSelection('visa')}>
+      <div className={`shadow-xl border rounded p-10 w-1/3 flex justify-between items-center hover:bg-slate-800 cursor-pointer ${selectedMethod === 'visa' ? 'border-blue-500 bg-gray-950' : ''}`} onClick={() => handleSelection('visa')}>
         <div className='flex items-center gap-2'>
           <svg width="40" height="40" fill="currentColor" className="bi bi-credit-card-2-front" viewBox="0 0 16 16">
             <path d="M14 3a1 1 0 0 1 1 1v8a1 1 0 0 1-1 1H2a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1zM2 2a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2z" />
