@@ -40,21 +40,21 @@ function ComponentCarousel() {
     let gamesInCart = JSON.parse(localStorage.getItem("gamesInCart")) || [];
 
     try {
-      for (const gameId of gamesInCart) {
+      for (const GameId of gamesInCart) {
         try {
           await PostData(
             "purchases",
-            { gameId: gameId },
+            { gameId: GameId },
             token
           );
 
-          gamesInCart = gamesInCart.filter(id => id !== gameId);
+          gamesInCart = gamesInCart.filter(id => id !== GameId);
           localStorage.setItem("gamesInCart", JSON.stringify(gamesInCart));
 
         } catch (error) {
           if (error.response && error.response.data.message === "User already has that game") {
             alert(error.response.data.message);
-            gamesInCart = gamesInCart.filter(id => id !== gameId);
+            gamesInCart = gamesInCart.filter(id => id !== GameId);
             localStorage.setItem("gamesInCart", JSON.stringify(gamesInCart));
           } else {
             alert(error.response.data.message);

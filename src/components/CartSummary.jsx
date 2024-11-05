@@ -15,8 +15,8 @@ function CartSummary({ updateCartTotal }) {
         const gamesInCart = await JSON.parse(localStorage.getItem("gamesInCart"));
         if (gamesInCart) {
           const fetchedGames = await Promise.all(
-            gamesInCart.map(async (gameId) => {
-              const data = await FetchData(`games/${gameId}`, token);
+            gamesInCart.map(async (GameId) => {
+              const data = await FetchData(`games/${GameId}`, token);
               return data;
             })
           )
@@ -46,7 +46,7 @@ function CartSummary({ updateCartTotal }) {
   const RemoveFromCart = (id) => {
     let gamesInCart = JSON.parse(localStorage.getItem("gamesInCart") || "[]");
   
-    gamesInCart = gamesInCart.filter(gameId => gameId !== id.toString());
+    gamesInCart = gamesInCart.filter(GameId => GameId !== id.toString());
     
     localStorage.setItem("gamesInCart", JSON.stringify(gamesInCart));
   
