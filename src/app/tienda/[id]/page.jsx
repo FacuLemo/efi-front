@@ -92,7 +92,7 @@ function Page(context) {
           const profilePurchases = await FetchData("purchases/", token);
           try {
             profilePurchases.map((game, index) => (
-              game.gameId == id ? setIsOwned(true) : ""
+              game.GameId == id ? setIsOwned(true) : ""
             ))
           }
           catch (e) {
